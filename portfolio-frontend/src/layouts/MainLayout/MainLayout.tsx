@@ -1,28 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { Layout, Menu, Breadcrumb } from 'antd';
 import Logo from './Logo';
+import MainMenu from './MainMenu';
 const { Header, Content, Footer } = Layout;
 
 export interface LayoutProps  { 
   children: React.ReactNode
 }
 
-export default (props: LayoutProps) => (
-  <Layout>
-    <Header style={{ position: 'fixed', zIndex: 1, width: '100%' }}>
-      <Logo />
-      <Menu
-        theme="dark"
-        mode="horizontal"
-        defaultSelectedKeys={['2']}
-        items={new Array(3).fill(null).map((_, index) => ({
-          key: String(index + 1),
-          label: `nav ${index + 1}`,
-        }))}
-      />
-    </Header>
-    <Content className="site-layout" style={{ padding: '0 50px', marginTop: 64 }}>
-      {props.children}
-    </Content>
-  </Layout>
-);
+function handleResize(handler: (isMobile: boolean) => void) {
+  
+}
+
+export default (props: LayoutProps) => {
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+  useEffect(() => {
+    window.addEventListener('resize', (e) => setWindowHeight(window.innerHeight));
+  }, [])
+
+  return (
+    <Layout>
+      <Header>
+        <Logo />
+        <MainMenu />
+      </Header>
+      <Content style={{ margin: 16 }}>
+        <div style={{ padding: 16, background: '#fff', minHeight: windowHeight - 150 }}>
+          {props.children}
+        </div>
+      </Content>
+      <Footer style={{textAlign: 'center'}}>Hello World Portfolio Inc.</Footer>
+    </Layout>
+  )
+};
