@@ -1,6 +1,6 @@
 class Performance < ApplicationRecord
-  default_scope -> { with_attached_avatar }
-
   has_one_attached :recording
   belongs_to :user
+
+  default_scope -> { with_attached_recording }
 end
