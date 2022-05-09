@@ -20,8 +20,6 @@ RSpec.describe 'api/v1/performances', type: :request do
       tags 'Performances'
       consumes 'multipart/form-data'
       produces 'application/json'
-      # parameter name: "user_id", in: :formData, type: :string, required: true
-      # parameter name: "name", in: :formData, type: :string, required: true
       parameter name: "recording", in: :formData, type: :file, required: true
       # parameter name: :performance, in: :formData, schema: {
       #   type: :object,

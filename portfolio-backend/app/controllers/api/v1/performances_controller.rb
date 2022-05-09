@@ -5,7 +5,7 @@ class Api::V1::PerformancesController < ApplicationController
   def index
     @performances = Performance.all
 
-    render_jsonapi collection: @performances, serializer: ::::PerformanceSerializer
+    render_jsonapi collection: @performances, serializer: ::PerformanceSerializer
   end
 
   # GET /performances/1
