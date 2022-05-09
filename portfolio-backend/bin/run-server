@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -x
+
+PORT="${PORT:-3000}"
+
+bundle install
+
+rake db:exists
+DATABASE_EXISTANCE_CHECK=$?
+
+if [ $DATABASE_EXISTANCE_CHECK -ne 0 ]; then
+  echo "Creating Database"
+  rake db:create
+fi
+
+rake db:migrate
+
+if [ $DATABASE_EXISTANCE_CHECK -ne 0 ]; then
+  echo "Running Seeds"
+  rake db:seed
+fi
+
+rm -rf ./tmp/pids
+bundle exec rails s -p $PORT -b '0.0.0.0'

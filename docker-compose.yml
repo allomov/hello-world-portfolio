@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: "./portfolio-frontend"
+      dockerfile: "dev.Dockerfile"
+    command: "./bin/run-dev-server"
+    restart: unless-stopped
+    volumes:
+    - "./portfolio-frontend:/app"
+    depends_on:
+    - backend
+    ports:
+    - "8081:8081"
+    environment:
+      PORT: "8081"
+      BACKEND_URL: "http://localhost:3000"
+      FRONTEND_URL: "http://localhost:8081"
+
+  backend:
+    build:
+      context: "./portfolio-backend"
+      dockerfile: "dev.Dockerfile"
+    command: "./bin/run-server"
+    restart: unless-stopped
+    depends_on:
+    - "backend_db"
+    ports:
+    - "3000:3000"
+    volumes:
+    - "./portfolio-backend:/app"
+    environment:
+      RAILS_ENV: development
+      PORT: "3000"
+      DATABASE_HOST: "backend_db"
+      DATABASE_NAME: "portfolio_db"
+      DATABASE_USER: "portfolio"
+      DATABASE_PASSWORD: "password"
+      BACKEND_URL: "http://localhost:3000"
+      FRONTEND_URL: "http://localhost:8081"
+
+  backend_db:
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: portfolio
+      POSTGRES_DB: portfolio_db
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - backend_data:/var/lib/postgresql/data
+
+volumes:
+  backend_data: {}
