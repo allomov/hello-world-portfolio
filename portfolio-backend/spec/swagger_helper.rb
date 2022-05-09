@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'i18n'
+require 'faker'
+I18n.reload!
 
 RSpec.configure do |config|
   # Specify a root folder where Swagger JSON files are generated
