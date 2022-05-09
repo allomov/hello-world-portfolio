@@ -8,14 +8,14 @@ export interface LayoutProps  {
   children: React.ReactNode
 }
 
-function handleResize(handler: (isMobile: boolean) => void) {
-  
-}
-
 export default (props: LayoutProps) => {
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+
+  const handleResize = () => setWindowHeight(window.innerHeight);
+
   useEffect(() => {
-    window.addEventListener('resize', (e) => setWindowHeight(window.innerHeight));
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [])
 
   return (
