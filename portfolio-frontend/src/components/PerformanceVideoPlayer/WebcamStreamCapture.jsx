@@ -1,14 +1,23 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Content, Button, Empty } from 'antd';
 import Webcam from "react-webcam";
+import styled from 'styled-components';
+// import {isEmpty} from 'lodash';
 
-const WebcamStreamCapture = () => {
+const WebcamStreamCapture = ({
+  onReadynessChange,
+  onVideoChange
+}) => {
+  const [isEmptyComponent, setEmpty] = useState(true);
   const webcamRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const [capturing, setCapturing] = useState(false);
   const [recordedChunks, setRecordedChunks] = useState([]);
+  useEffect(() => setEmpty(true), [])
 
   const handleStartCaptureClick = useCallback(() => {
     setCapturing(true);
+    setRecordedChunks([]);
     mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
       mimeType: "video/webm"
     });
@@ -17,12 +26,12 @@ const WebcamStreamCapture = () => {
       handleDataAvailable
     );
     mediaRecorderRef.current.start();
-  }, [webcamRef, setCapturing, mediaRecorderRef]);
+  }, [webcamRef, setCapturing, mediaRecorderRef, isEmptyComponent]);
 
   const handleDataAvailable = useCallback(
     ({ data }) => {
       if (data.size > 0) {
-        setRecordedChunks((prev) => prev.concat(data));
+        onVideoChange(data)
       }
     },
     [setRecordedChunks]
@@ -33,36 +42,56 @@ const WebcamStreamCapture = () => {
     setCapturing(false);
   }, [mediaRecorderRef, webcamRef, setCapturing]);
 
-  const handleDownload = useCallback(() => {
-    if (recordedChunks.length) {
-      const blob = new Blob(recordedChunks, {
-        type: "video/webm"
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      document.body.appendChild(a);
-      a.style = "display: none";
-      a.href = url;
-      a.download = "react-webcam-stream-capture.webm";
-      a.click();
-      window.URL.revokeObjectURL(url);
-      setRecordedChunks([]);
-    }
-  }, [recordedChunks]);
+  const videoConstraints = {facingMode: "user"};
+  const widthToHeightRatio = 3/4;
+  const width = 720;
+  const height = width * widthToHeightRatio;
+  // const height = videoConstraints.height * (width / videoConstraints.width);
+
+  const startRecordingButton = <StyledButton type="primary" style={{zIndex: 0}} onClick={handleStartCaptureClick}>ReRecord</StyledButton>
+  const stopRecordingButton = <StyledButton type="primary" style={{zIndex: 0}} onClick={handleStopCaptureClick}>Stop</StyledButton>;
 
   return (
-    <>
-      <Webcam audio={false} ref={webcamRef} />
-      {capturing ? (
-        <button onClick={handleStopCaptureClick}>Stop Capture</button>
-      ) : (
-        <button onClick={handleStartCaptureClick}>Start Capture</button>
-      )}
-      {recordedChunks.length > 0 && (
-        <button onClick={handleDownload}>Download</button>
-      )}
-    </>
+    <div style={{width, height, position: "relative", marginBottom: 20, zIndex: 100}}>
+      <div style={{zIndex: 100, visibility: (isEmptyComponent ? 'visible' : 'hidden')}}>
+        <Empty style={{
+          width,
+          height,
+          background: 'rgb(0.85, 0.85, 0.85)',
+          color: '#fff',
+          paddingTop: 80,
+          margin: 0,
+          position: 'absolute',
+          zIndex: 100
+        }}>
+          Please, record something
+        </Empty>
+        <StyledButton
+          type="primary"
+          style={{zIndex: 100}}
+          onClick={() => {setEmpty(false); handleStartCaptureClick()} }
+         >
+           Record
+         </StyledButton>
+      </div>
+
+      <Webcam
+          audio={true}
+          ref={webcamRef}
+          width={width}
+          height={height}
+          videoConstraints={videoConstraints}
+          onUserMedia={() => onReadynessChange(true)}
+      />
+      {capturing ? stopRecordingButton : startRecordingButton}
+    </div>
   );
 };
+
+const StyledButton = styled(Button)`
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+`;
 
 export default WebcamStreamCapture;

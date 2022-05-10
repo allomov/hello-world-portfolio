@@ -1,23 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { List, message, Avatar, Typography, Button } from 'antd';
+import { List, message, Avatar, Typography, Button, Spin } from 'antd';
 import { Link, useParams } from 'react-router-dom';
 import { PlusCircleFilled } from '@ant-design/icons';
 import styled from 'styled-components';
+import { getUserPerformances } from 'services/PerformancesApi';
 
 const {Title} = Typography;
 
 const UserPerformancesPage = () => {
+  const [isLoading, setLoading] = useState(true);
+  const [userPerformances, setUserPerformances] = useState([]);
   const { userId } = useParams();
-  const userPerformances = [
-    {
-      id: "1",
-      userId: "1",
-      title: "title"
+
+  useEffect(() => {
+    async function loadUserPerformances() {
+      const users = await getUserPerformances({userId: userId});
+      setLoading(false);
+      setUserPerformances(users);
     }
-  ];
+    loadUserPerformances();
+  }, []);
+
 
   return (
-    <>
+    <Spin spinning={isLoading}>
       <Title>
         Peroformances
         <AddButton to={`/users/${userId}/performances/new`}><PlusCircleFilled /></AddButton>
@@ -26,13 +32,12 @@ const UserPerformancesPage = () => {
           {userPerformances.map(performance => (
             <List.Item key={performance.userId}>
               <List.Item.Meta
-                title={<StyledLink to={`/performances/${performance.id}`}>{performance.title}</StyledLink>}
-
+                title={<StyledLink to={`/performances/${performance.id}`}>{performance.title || "Undefined"}</StyledLink>}
               />
             </List.Item>
           ))}
       </List>
-    </>
+    </Spin>
   );
 };
 

@@ -1,1 +1,1 @@
-export { default } from './PerformanceVideoPlayer';
+export { default } from './WebcamStreamCapture';
