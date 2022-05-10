@@ -10,4 +10,13 @@ namespace :db do
       exit 0
     end
   end
+
+  task :seeded do
+    Rake::Task['environment'].invoke
+    if User.all.count > 0
+      exit 0
+    else
+      exit 1
+    end
+  end
 end

@@ -15,7 +15,9 @@ fi
 
 rake db:migrate
 
-if [ $DATABASE_EXISTANCE_CHECK -ne 0 ]; then
+rake db:seeded
+DATABASE_SEEDS_CHECK=$?
+if [ $DATABASE_SEEDS_CHECK -ne 0 ]; then
   echo "Running Seeds"
   rake db:seed
 fi

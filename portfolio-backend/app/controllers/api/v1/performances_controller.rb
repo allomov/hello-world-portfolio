@@ -4,6 +4,7 @@ class Api::V1::PerformancesController < ApplicationController
   # GET /performances
   def index
     @performances = Performance.all
+    @performances = @performances.where(user_id: params[:user_id]) if params.key?(:user_id)
 
     render_jsonapi collection: @performances, serializer: ::PerformanceSerializer
   end
