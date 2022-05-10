@@ -46,6 +46,6 @@ class Api::V1::PerformancesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def performance_params
-      params.fetch(:performance, {})
+      params.permit(:user_id, :title, :recording)
     end
 end
